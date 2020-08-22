@@ -1,0 +1,40 @@
+extends layout
+
+h1 Edit proxy parameters
+
+form
+    block
+        block ---
+        block
+            block
+                label(for='form-edit-name') Name
+                input(type='text' name='name' id='form-edit-name')
+            block
+                label(for='form-edit-port') Port
+                input(type='text' name='port' id='form-edit-port')
+
+    block
+        block Target
+        block
+            block
+                label(for='form-edit-target-protocol') Protocol
+                input(type='text' name='protocol' id='form-edit-target-protocol')
+            block
+                label(for='form-edit-target-host') Host
+                input(type='text' name='host' id='form-edit-target-host')
+            block
+                label(for='form-edit-target-port') Port
+                input(type='text' name='port' id='form-edit-target-port')
+
+    block
+        block Advanced Options
+        block
+            block
+                label(form='form-edit-secure') Secure
+                checkbox(value='false' id='form-edit-secure')
+
+    block(class='form-actions')
+        block(class='form-primary-action')
+            block(class='icon-save') Save
+        bloc(class='form-secondary-action')
+            block(class='icon-reset') Reset
