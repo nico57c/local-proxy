@@ -12,21 +12,12 @@ function serializeToJson(serializer){
 
 function ProxyAppEngine() {
 
-    const getModalBtnConfirm = function () {
-        return $('#app-modal-btn-confirm');
-    }
+    const modalBtnConfirm = $('#app-modal-btn-confirm');
+    const modalTitle = $('#app-modal-title');
+    const modal = $('#app-modal');
+    const modalBody = $('#app-modal-body');
+    const modalError = $('#app-modal-error');
 
-    const getModelTitle = function() {
-        return $('#app-modal-title');
-    }
-
-    const getModal = function() {
-        return $('#app-modal');
-    }
-
-    const getModalBody = function() {
-        return $('#app-modal-body');
-    }
 
     const getForm = function(id) {
         const { ajax } = window.rxjs.ajax;
@@ -81,45 +72,65 @@ function ProxyAppEngine() {
         });
     }
 
-    const openModelForm = function(id, title, onConfirm) {
-        getModal().modal('hide');
-
-        getModelTitle().html(title);
+    const openModalForm = function(id, title, onConfirm) {
+        modal.modal('hide');
+        modalError.html('');
+        modalTitle.html(title);
         getForm(id).subscribe(html => {
-            getModalBody().html('<div id="form-proxy-config">'+ html.response + '</div>');
-            getModal().modal('show');
+            modalBody.html('<div id="form-proxy-config">'+ html.response + '</div>');
+            modal.modal('show');
         });
-
-        getModalBtnConfirm().off('click')
-        getModalBtnConfirm().on('click', function(event) {
-            onConfirm();
-        });
+        modalBtnConfirm.html('Save');
+        modalBtnConfirm.off('click');
+        modalBtnConfirm.on('click', onConfirm);
     }
 
-    const openDialog = function(title, message) {
-       // TODO confirmation dialog
+    const openDialog = function(title, message, onConfirm) {
+        modal.modal('hide');
+        modalError.html('');
+        modalTitle.html(title);
+        modalBody.html(message);
+        modalBtnConfirm.html('Delete');
+        modalBtnConfirm.off('click');
+        modalBtnConfirm.on('click', onConfirm);
+        modal.modal('show');
     }
 
     this.openModalForCreation = function() {
-        openModelForm(undefined, 'Create Proxy Configuration', function() {
-            postForm( serializeToJson($('#form-proxy-config form').serializeArray()) ).subscribe(response => {
-                console.log(response);
+        openModalForm(undefined, 'Create Proxy Configuration', function(event) {
+            postForm( serializeToJson($('#form-proxy-config form').serializeArray()) ).subscribe(res => {
+                if(res.status == 200 && res.response.success === true) {
+                    modalBtnConfirm.off('click');
+                    modal.modal('hide');
+                } else {
+                    modalError.html(res.response.error === undefined? 'An error occurred during creation.': res.response.error);
+                }
             });
         });
     }
 
     this.openModalForEdition = function(id) {
-        openModelForm(id, 'Edit Proxy Configuration', function() {
-            putForm( serializeToJson($('#form-proxy-config form').serializeArray()), id).subscribe(response => {
-                console.log(response);
+        openModalForm(id, 'Edit Proxy Configuration', function(event) {
+            putForm( serializeToJson($('#form-proxy-config form').serializeArray()), id).subscribe(res => {
+                if(res.status === 200 && res.response.success === true) {
+                    modalBtnConfirm.off('click');
+                    modal.modal('hide');
+                } else {
+                    modalError.html(res.response.error === undefined? 'An error occurred during edition.': res.response.error);
+                }
             });
         });
     }
 
     this.openDialogForDeletion = function(id, name) {
-        openDialog('Delete Proxy Configuration', 'Are you sure to delete proxy configuration "' + name + '" ?', function() {
-            deleteItem(id).subscribe( response => {
-                console.log(reponse);
+        openDialog('Delete Proxy Configuration', 'Are you sure to delete proxy configuration "' + name + '" ?', function(event) {
+            deleteItem(id).subscribe( res => {
+                if(res.status === 200 && res.response.success === true) {
+                    modal.modal('hide');
+                    modalBtnConfirm.off('click');
+                } else {
+                    modalError.html(res.response.error === undefined? 'An error occurred during deletion.': res.response.error);
+                }
             });
         });
     }

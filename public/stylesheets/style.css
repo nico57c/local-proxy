@@ -43,4 +43,15 @@ a {
 .proxy-list-id > button:hover {
   background-color: whitesmoke; }
 
+.modal-error-message {
+  color: darkred;
+  font-weight: bold;
+  width: 100%;
+  margin-left: 2rem;
+  margin-right: 1rem;
+  text-align: right; }
+
+.proxy-list td {
+  vertical-align: middle !important; }
+
 /*# sourceMappingURL=style.css.map */

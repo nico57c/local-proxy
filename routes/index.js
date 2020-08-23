@@ -1,17 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const proxyParameter = require('../proxy-engine/proxy-parameter');
+const proxyManager = require('../proxy-engine/proxy-manager');
 
-const dbJ = require('node-json-db');
-const dbconfig = require('node-json-db/dist/lib/JsonDBConfig');
-
-const db = new dbJ.JsonDB(new dbconfig.Config("proxy-parameters", true, false, '/'));
-const data = db.getData("/");
-
-/* GET home page. */
 router.get('/', function(req, res, next) {
+  const data = proxyParameter.selectAll()
+
   res.render('index', {
-    title: 'Http to https proxy',
-    data: data
+    title: 'Local Proxy',
+    data: data.id !== undefined? data.id : {},
+    proxyManager: proxyManager
   });
 });
 

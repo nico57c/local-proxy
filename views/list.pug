@@ -1,0 +1,36 @@
+div(class='proxy-list')
+    table(class='table table-bordered')
+        thead(class='thead-light')
+            tr
+                th(scope='col' colspan=4 style='background-color: transparent')
+                th(scope='col' colspan=3 class='text-center') Target
+            tr
+                th(scope='col') #
+                th(scope='col') Is Running
+                th(scope='col') Name
+                th(scope='col') Port
+                th(scope='col') Protocol
+                th(scope='col') Host
+                th(scope='col') Port
+        tbody
+            each row, key in data
+                tr
+                    td(scope='row' class='proxy-list-id')
+                        button(class='btn btn-sm dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false')= row.id
+                        div(class='dropdown-menu' aria-labelledby='dropdownMenuReference')
+                            a(class='dropdown-item' href='#edit' onClick="ProxyApp.startProxy('" + row.id + "')" rowid= row.id) Start
+                            a(class='dropdown-item' href='#edit' onClick="ProxyApp.stopProxy('" + row.id + "')" rowid= row.id) Stop
+                            a(class='dropdown-item' href='#edit' onClick="ProxyApp.openModalForEdition('" + row.id + "')" rowid= row.id) Edit
+                            a(class='dropdown-item' href='#edit' onClick="ProxyApp.openDialogForDeletion('" + row.id + "','" + row.name + "')" rowid= row.id) Delete
+                    td(scope="row")
+                        svg(class="bi" width="32" height="32" fill="currentColor")
+                            if proxyManager.isOpen(row.id)
+                                <use xlink:href="/images/bootstrap-icons.svg#wifi-2" />
+                            else
+                                <use xlink:href="/images/bootstrap-icons.svg#wifi-off" />
+                    td(scope="row")= row.name
+                    td(scope="row")= row.port
+                    td(scope="row")= row.target_protocol
+                    td(scope="row")= row.target_host
+                    td(scope="row")= row.target_port
+

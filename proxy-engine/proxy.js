@@ -1,35 +1,82 @@
 const httpProxy = require('http-proxy');
+const proxyParameters = require('./proxy-parameter.js');
 
-function proxyEngine(proxyParameters) {
+function proxy(configId) {
 
-    this.parameters = proxyParameters;
+    let status = {
+        id: configId,
+        ports: {
+            listen: null,
+            target: null
+        },
+        open: false
+    };
 
-    this.run = function() {
+    this.proxy = null;
 
-        console.log('Start proxy of "' + this.parameters.name + '"');
+    this.open = function() {
+        const parameters = proxyParameters.select(configId);
+        console.log('Start proxy "' + configId + '"');
 
         // Setup parameters from Proxy Parameters to proxy library
-        this.httpProxy = httpProxy.createProxyServer({
+        this.proxy = httpProxy.createProxyServer({
             target: {
-                protocol: this.parameters.target.protocol,
-                host: this.parameters.target.host,
-                port: this.parameters.target.port,
+                protocol: parameters.target_protocol,
+                host: parameters.target_host,
+                port: parameters.target_port,
             },
             changeOrigin: true,
-            secure: false,
-        }).listen(this.parameters.port);
+            secure: parameters.secure
+        })
+        .listen(parameters.port, () => {
+            status = {
+                ...{ status },
+                ports: {
+                    listen: parameters.port,
+                    target: parameters.target_port
+                },
+                open: true
+            }
+        })
+        .on('error', () => {
+            status = {
+                ...{ status },
+                ports: {
+                    listen: null,
+                    target: null
+                },
+                open: false
+            }
+        });
 
     };
 
     this.close = function() {
-        let that = this;
-        console.log('close proxy of ' + this.parameters.name);
-        this.httpProxy.close(function() {
-            console.log('Proxy "' + that.parameters.name + '" closed');
-        });
+        console.log('Close proxy "' + configId + '"');
+        this.proxy.close(() =>  console.log('Proxy "' + configId + '" closed'));
     };
 
+    this.isOpen = function() {
+       return status.open;
+    }
+
+    this.openPort = function() {
+       return status.ports.listen;
+    }
+
+    this.refresh = function() {
+        let that = this;
+        console.log('Refresh poxy connexion "' + configId + '"');
+        this.proxy.close(() => {
+            console.log('Proxy "' + configId + '" closed');
+            that.open();
+        });
+    }
+
+    this.getStatus = function() {
+        return {date: Math.floor(Date.now()/1000), ...{ status } };
+    }
 }
 
-module.exports = proxyEngine;
+module.exports = proxy;
 
