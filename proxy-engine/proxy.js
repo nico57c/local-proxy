@@ -19,7 +19,7 @@ function proxy(configId) {
         console.log('Start proxy "' + configId + '"');
 
         // Setup parameters from Proxy Parameters to proxy library
-        this.proxy = httpProxy.createProxyServer({
+        this.proxy = new httpProxy.createProxyServer({
             target: {
                 protocol: parameters.target_protocol,
                 host: parameters.target_host,
@@ -27,20 +27,12 @@ function proxy(configId) {
             },
             changeOrigin: true,
             secure: parameters.secure
-        })
-        .listen(parameters.port, () => {
+        });
+
+        this.proxy.on('error', () => {
+            console.log('Proxy "' + configId + '" in error');
             status = {
-                ...{ status },
-                ports: {
-                    listen: parameters.port,
-                    target: parameters.target_port
-                },
-                open: true
-            }
-        })
-        .on('error', () => {
-            status = {
-                ...{ status },
+                ...status,
                 ports: {
                     listen: null,
                     target: null
@@ -49,12 +41,32 @@ function proxy(configId) {
             }
         });
 
-    };
+        this.proxy.listen(parameters.port, () => {
+            status = {
+                ...status,
+                ports: {
+                    listen: parameters.port,
+                    target: parameters.target_port
+                },
+                open: true
+            }
+        });
+    }
 
     this.close = function() {
         console.log('Close proxy "' + configId + '"');
-        this.proxy.close(() =>  console.log('Proxy "' + configId + '" closed'));
-    };
+        this.proxy.close(function() {
+            console.log('Proxy "' + configId + '" closed');
+            status = {
+                ...status,
+                ports: {
+                    listen: null,
+                    target: null
+                },
+                open: false
+            };
+        });
+    }
 
     this.isOpen = function() {
        return status.open;
@@ -74,7 +86,7 @@ function proxy(configId) {
     }
 
     this.getStatus = function() {
-        return {date: Math.floor(Date.now()/1000), ...{ status } };
+        return {date: Math.floor(Date.now()/1000), ...status };
     }
 }
 

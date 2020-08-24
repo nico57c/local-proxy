@@ -13,4 +13,13 @@ router.get('/', function(req, res, next) {
   });
 });
 
+router.get('/list', function(req, res, next) {
+  const data = proxyParameter.selectAll()
+
+  res.render('list', {
+    data: data.id !== undefined? data.id : {},
+    proxyManager: proxyManager
+  });
+});
+
 module.exports = router;

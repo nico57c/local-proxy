@@ -20,9 +20,19 @@ function proxyManager() {
         if(proxies[configId] === undefined || proxies[configId].isOpen() === false) {
             proxies[configId] = new Proxy(configId);
             proxies[configId].open();
-        } else {
-            return this.getStatus(configId);
         }
+        return this.getStatus(configId);
+    }
+
+    this.stop = function(configId) {
+        if(ProxyParameter.exists(configId) === false) {
+            return undefined;
+        }
+
+        if(proxies[configId] !== undefined || proxies[configId].isOpen() === true) {
+            proxies[configId].close();
+        }
+        return this.getStatus(configId);
     }
 
     this.restart = function(configId) {
@@ -32,9 +42,8 @@ function proxyManager() {
 
         if(proxies[configId] !== undefined) {
             proxies[configId].refresh();
-        } else {
-            return undefined;
         }
+        return this.getStatus(configId);
     }
 
     this.closeAll = function() {

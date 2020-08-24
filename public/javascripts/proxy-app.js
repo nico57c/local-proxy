@@ -17,6 +17,7 @@ function ProxyAppEngine() {
     const modal = $('#app-modal');
     const modalBody = $('#app-modal-body');
     const modalError = $('#app-modal-error');
+    const configList = $('#app-config-list');
 
 
     const getForm = function(id) {
@@ -27,6 +28,19 @@ function ProxyAppEngine() {
             responseType: 'text/html',
             headers: {
                 'Content-Type': 'text/html'
+            }
+        });
+    }
+
+    const proxy = function(id, startStop) {
+        if(id === undefined) return undefined;
+        const { ajax } = window.rxjs.ajax;
+        return ajax({
+            url: '/proxy/' + (startStop === true? 'start' : 'stop') + '?id=' + id,
+            method: 'GET',
+            responseType: 'json',
+            header: {
+                'Content-Type': 'application/json'
             }
         });
     }
@@ -96,10 +110,38 @@ function ProxyAppEngine() {
         modal.modal('show');
     }
 
+    this.refreshConfigList = function() {
+        const { ajax } = window.rxjs.ajax;
+        ajax({
+            url: '/list',
+            method: 'GET',
+            responseType: 'text/html',
+            headers: {
+                'Content-Type': 'text/html',
+            }
+        }).subscribe(html => configList.html(html.response) );
+    }
+
+    this.startProxy = function(id) {
+        // TODO add notification
+        let that = this;
+        proxy(id, true).subscribe(response => {
+            that.refreshConfigList();
+        });
+    }
+
+    this.stopProxy = function(id) {
+        // TODO add notification
+        let that = this;
+        proxy(id, false).subscribe(response => {
+            that.refreshConfigList();
+        })
+    }
+
     this.openModalForCreation = function() {
         openModalForm(undefined, 'Create Proxy Configuration', function(event) {
             postForm( serializeToJson($('#form-proxy-config form').serializeArray()) ).subscribe(res => {
-                if(res.status == 200 && res.response.success === true) {
+                if(res.status === 200 && res.response.success === true) {
                     modalBtnConfirm.off('click');
                     modal.modal('hide');
                 } else {

@@ -11,6 +11,12 @@ const proxyRouter = require('./routes/proxy');
 
 const app = express();
 
+let server_error = {
+  error: false,
+  code: null,
+  message: null
+};
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -36,6 +42,11 @@ app.use(function(req, res, next) {
   next(createError(404));
 });
 
+app.on('error', function errorHandler (err, req, res, next) {
+    res.status(500)
+    res.render('error', { error: err })
+});
+
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
@@ -46,5 +57,15 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
+process.on('uncaughtException', function(err) {
+  server_error = {
+    error: true,
+    code: err.code,
+    message: err.message
+  };
+});
+
 
 module.exports = app;
