@@ -23,7 +23,7 @@ function proxyParameterFactory() {
            id: body.id,
            name: escape(body.name),
            port: parseInt(body.port) <= 0? 0: parseInt(body.port),
-           target_protocol: body.target_protocol === 'https'? 'https': 'http',
+           target_protocol: body.target_protocol === 'https'? 'https:': 'http:', // Warning https: dont forget ':'
            target_host: escape(body.target_host),
            target_port: parseInt(body.target_port) <= 0? 0: parseInt(body.target_port),
            secure: body.secure === true

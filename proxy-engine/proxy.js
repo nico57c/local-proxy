@@ -29,8 +29,8 @@ function proxy(configId) {
             secure: parameters.secure
         });
 
-        this.proxy.on('error', () => {
-            console.log('Proxy "' + configId + '" in error');
+        this.proxy.on('error', (error) => {
+            console.error('Proxy "' + configId + '" in error', error);
             status = {
                 ...status,
                 ports: {

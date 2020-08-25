@@ -15,10 +15,12 @@ form(class='form-container container')
                 label Protocol
                 div
                     div(class="form-check form-check-inline")
-                        input(class="form-check-input" type="radio" name="target_protocol" id="form-edit-target-http" value="http" checked= data.target_protocol==='http')
+                        <!-- ':' is required at the end in database for proxy lib -->
+                        input(class="form-check-input" type="radio" name="target_protocol" id="form-edit-target-http" value="http" checked= data.target_protocol==='http:')
                         label(class="form-check-label" for="form-edit-target-http") http
                     div(class="form-check form-check-inline")
-                        input(class="form-check-input" type="radio" name="target_protocol" id="form-edit-target-https" value="https" checked= data.target_protocol==='https')
+                        <!-- ':' is required at the end in database for proxy lib -->
+                        input(class="form-check-input" type="radio" name="target_protocol" id="form-edit-target-https" value="https" checked= data.target_protocol==='https:')
                         label(class="form-check-label" for="form-edit-target-https") https
             div(class='form-group')
                 label(for='form-edit-target-host') Host
